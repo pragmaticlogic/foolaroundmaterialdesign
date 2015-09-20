@@ -11,6 +11,14 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="colorControlHighlight">@color/windowBackground</item>
     </style>
 
+    <style name="Button" parent="Base.Widget.AppCompat.Button">
+    </style>
+
+    <style name="Button.Branded" parent="Button">
+        <item name="colorButtonNormal">?attr/colorPrimary</item>
+    </style>
 </resources>
