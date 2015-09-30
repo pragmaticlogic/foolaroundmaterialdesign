@@ -17,6 +17,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    repositories {
+        maven { url "https://jitpack.io" }
+    }
 }
 
 dependencies {
@@ -25,4 +28,7 @@ dependencies {
     compile 'com.android.support:design:23.0.1'
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'com.android.support:recyclerview-v7:23.0.+'
+    compile('com.afollestad.material-dialogs:core:0.8.1.0@aar') {
+        transitive = true
+    }
 }

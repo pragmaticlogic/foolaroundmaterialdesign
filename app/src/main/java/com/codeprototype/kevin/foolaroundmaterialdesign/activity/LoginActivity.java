@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
 
 public class LoginActivity extends AppCompatActivity {
@@ -29,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         final TextInputLayout passwordWrapper = (TextInputLayout) findViewById(R.id.passwordWrapper);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        if(toolbar != null) {
+        if (toolbar != null) {
             setSupportActionBar(toolbar);
             getSupportActionBar().setTitle(R.string.welcome_label);
             getSupportActionBar().setHomeButtonEnabled(true);
@@ -49,7 +50,12 @@ public class LoginActivity extends AppCompatActivity {
         _loginButton.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                new MaterialDialog.Builder(LoginActivity.this)
+                        .title("R.string.title")
+                        .content("R.string.content")
+                        .positiveText("agree")
+                        .negativeText("disagree")
+                        .show();
             }
         });
     }
