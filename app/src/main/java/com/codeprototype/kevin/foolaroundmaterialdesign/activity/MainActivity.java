@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
+import com.parse.ParseAnalytics;
+import com.parse.ParseUser;
 
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
 
@@ -25,8 +27,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
+
+        if (ParseUser.getCurrentUser() == null) {
+            navigateToLogin();
+        }
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -58,9 +63,14 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             return true;
         }
 
-        if(id == R.id.action_search){
+        else if (id == R.id.action_search) {
             Toast.makeText(getApplicationContext(), "Search action is selected!", Toast.LENGTH_SHORT).show();
             return true;
+        }
+
+        else if (id == R.id.action_logout) {
+            ParseUser.logOut();
+            navigateToLogin();
         }
 
         return super.onOptionsItemSelected(item);
@@ -69,6 +79,13 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     @Override
     public void onDrawerItemSelected(View view, int position) {
         displayView(position);
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     private void displayView(int position) {

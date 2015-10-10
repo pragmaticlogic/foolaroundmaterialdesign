@@ -8,9 +8,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -19,6 +24,7 @@ public class SignupActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
@@ -38,7 +44,44 @@ public class SignupActivity extends AppCompatActivity {
         _signupButton.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String userName = usernameWrapper.getEditText().getText().toString().trim();
+                String password = passwordWrapper.getEditText().getText().toString().trim();
+                String email = emailWrapper.getEditText().getText().toString().trim();
 
+                if (userName.isEmpty() || password.isEmpty() || email.isEmpty()) {
+                    new MaterialDialog.Builder(SignupActivity.this)
+                            .title(R.string.signup_error_title)
+                            .content(R.string.signup_error_message)
+                            .positiveText(android.R.string.ok)
+                            .negativeText(android.R.string.cancel)
+                            .show();
+                } else {
+                    ParseUser user = new ParseUser();
+                    user.setUsername(userName);
+                    user.setPassword(password);
+                    user.setEmail(email);
+
+                    setProgressBarIndeterminateVisibility(true);
+                    user.signUpInBackground(new SignUpCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            setProgressBarIndeterminateVisibility(false);
+                            if (e == null) {
+                                Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                            } else {
+                                new MaterialDialog.Builder(SignupActivity.this)
+                                        .title(R.string.signup_error_title)
+                                        .content(e.getMessage())
+                                        .positiveText(android.R.string.ok)
+                                        .negativeText(android.R.string.cancel)
+                                        .show();
+                            }
+                        }
+                    });
+                }
             }
         });
 

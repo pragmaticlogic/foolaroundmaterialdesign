@@ -6,6 +6,7 @@
     <string name="action_search">Search</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <string name="action_logout">Logout</string>
 
     <string name="nav_item_home">Home</string>
     <string name="nav_item_friends">Friends</string>
@@ -31,4 +32,8 @@
     <string name="welcome_label">Welcome to Fool Around</string>
     <string name="signup_button_label">Sign up</string>
     <string name="email_hint">Email address</string>
+    <string name="signup_error_title">Signup Error</string>
+    <string name="signup_error_message">You must provide user name, password and email address to signup.</string>
+    <string name="login_error_title">Login Error</string>
+    <string name="signup_login_message">You must provide your user name and password to login.</string>
 </resources>

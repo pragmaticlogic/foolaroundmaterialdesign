@@ -13,6 +13,8 @@ public class FoolAroundApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        Parse.enableLocalDatastore(this);
+
         Parse.initialize(this, "B4pZyohhGgsqqmlqRIC8Qloq6NvDvX3RvHgjE24n", "QCd3jZh6zroxpCNpSHOuDARiZUkDPb3nmlnDAIVW");
         ParseObject obj = new ParseObject("TestObj");
         obj.put("foo", "bar");

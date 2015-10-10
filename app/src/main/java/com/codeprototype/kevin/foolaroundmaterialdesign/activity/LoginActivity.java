@@ -10,11 +10,15 @@ import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
 
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -23,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -50,12 +55,39 @@ public class LoginActivity extends AppCompatActivity {
         _loginButton.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new MaterialDialog.Builder(LoginActivity.this)
-                        .title("R.string.title")
-                        .content("R.string.content")
-                        .positiveText("agree")
-                        .negativeText("disagree")
-                        .show();
+                String userName = usernameWrapper.getEditText().getText().toString().trim();
+                String password = passwordWrapper.getEditText().getText().toString().trim();
+
+                if (userName.isEmpty() || password.isEmpty()) {
+                    new MaterialDialog.Builder(LoginActivity.this)
+                            .title(R.string.login_error_title)
+                            .content(R.string.signup_login_message)
+                            .positiveText(android.R.string.ok)
+                            .negativeText(android.R.string.cancel)
+                            .show();
+                } else {
+                    setProgressBarIndeterminateVisibility(true);
+                    ParseUser.logInInBackground(userName, password, new LogInCallback() {
+                        @Override
+                        public void done(ParseUser user, ParseException e) {
+                            setProgressBarIndeterminateVisibility(false);
+
+                            if (e == null) {
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                            } else {
+                                new MaterialDialog.Builder(LoginActivity.this)
+                                        .title(R.string.login_error_title)
+                                        .content(e.getMessage())
+                                        .positiveText(android.R.string.ok)
+                                        .negativeText(android.R.string.cancel)
+                                        .show();
+                            }
+                        }
+                    });
+                };
             }
         });
     }
