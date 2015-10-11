@@ -36,4 +36,6 @@
     <string name="signup_error_message">You must provide user name, password and email address to signup.</string>
     <string name="login_error_title">Login Error</string>
     <string name="signup_login_message">You must provide your user name and password to login.</string>
+    <string name="empty_friends_label">Add friends to begin</string>
+    <string name="empty_messages_label">No new messages</string>
 </resources>

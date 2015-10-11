@@ -3,6 +3,7 @@ package com.codeprototype.kevin.foolaroundmaterialdesign.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,7 @@ import com.codeprototype.kevin.foolaroundmaterialdesign.R;
 /**
  * Created by kevin on 9/13/15.
  */
-public class FriendsFragment extends Fragment {
+public class FriendsFragment extends ListFragment {
     public FriendsFragment() {
 
     }
@@ -29,7 +30,7 @@ public class FriendsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_friends, container, false);
 
 
-        // Inflate the layout for this fragment
+
         return rootView;
     }
 
