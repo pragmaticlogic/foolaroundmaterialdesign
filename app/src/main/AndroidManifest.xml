@@ -2,12 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.codeprototype.kevin.foolaroundmaterialdesign" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
+        android:name=".FoolAroundApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name=".FoolAroundApplication">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name" >
@@ -19,17 +22,25 @@
         </activity>
         <activity
             android:name=".activity.LoginActivity"
+            android:exported="true"
             android:label="@string/title_activity_login"
-            android:screenOrientation="portrait"
-            android:exported="true" >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".activity.SignupActivity"
             android:label="@string/title_activity_signup"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.EditFriendsActivity"
+            android:label="@string/title_activity_edit_friends"
+            android:parentActivityName=".activity.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.codeprototype.kevin.foolaroundmaterialdesign.activity.MainActivity" />
         </activity>
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest>
