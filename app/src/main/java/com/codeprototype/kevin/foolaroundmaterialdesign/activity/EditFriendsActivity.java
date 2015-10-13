@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -17,7 +18,9 @@ import com.codeprototype.kevin.foolaroundmaterialdesign.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -25,6 +28,8 @@ public class EditFriendsActivity extends AppCompatActivity {
 
     public static final String TAG  = EditFriendsActivity.class.getSimpleName();
     protected List<ParseUser> mUsers;
+    protected ParseRelation<ParseUser> mFriendsRelation;
+    protected ParseUser mCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,28 @@ public class EditFriendsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        final ListView listView = (ListView) findViewById(android.R.id.list);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (listView.isItemChecked(position)) {
+                    mFriendsRelation.add(mUsers.get(position));
+
+                } else {
+                    mFriendsRelation.remove(mUsers.get(position));
+                }
+                mCurrentUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.i(TAG, e.getMessage());
+                        }
+                    }
+                });
+            }
+        });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
@@ -41,6 +68,9 @@ public class EditFriendsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        mCurrentUser = ParseUser.getCurrentUser();
+        mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
         setProgressBarIndeterminateVisibility(true);
 
@@ -62,9 +92,11 @@ public class EditFriendsActivity extends AppCompatActivity {
                     }
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                             EditFriendsActivity.this,
-                            android.R.layout.simple_list_item_checked);
+                            android.R.layout.simple_list_item_checked, usernames);
                     ListView listView = (ListView) findViewById(android.R.id.list);
                     listView.setAdapter(adapter);
+
+                    addFriendCheckmarks();
                 } else {
                     Log.e(TAG, e.getMessage());
                     new MaterialDialog.Builder(EditFriendsActivity.this)
@@ -73,6 +105,28 @@ public class EditFriendsActivity extends AppCompatActivity {
                             .positiveText(android.R.string.ok)
                             .negativeText(android.R.string.cancel)
                             .show();
+                }
+            }
+        });
+    }
+
+    private void addFriendCheckmarks() {
+        mFriendsRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> friends, ParseException e) {
+                if (e == null) {
+                    ListView listView = (ListView) findViewById(android.R.id.list);
+
+                    for (int i = 0; i < mUsers.size(); i++) {
+                        ParseUser user = mUsers.get(i);
+                        for (ParseUser friend : friends ) {
+                            if (user.getObjectId().equals(friend.getObjectId())) {
+                                listView.setItemChecked(i, true);
+                            }
+                        }
+                    }
+                } else {
+                    Log.e(TAG, e.getMessage());
                 }
             }
         });
