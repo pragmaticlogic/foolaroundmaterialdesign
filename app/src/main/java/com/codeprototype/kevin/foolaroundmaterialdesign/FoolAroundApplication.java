@@ -2,6 +2,7 @@ package com.codeprototype.kevin.foolaroundmaterialdesign;
 
 import android.app.Application;
 
+import com.activeandroid.ActiveAndroid;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -12,6 +13,8 @@ public class FoolAroundApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        ActiveAndroid.initialize(this);
 
         Parse.enableLocalDatastore(this);
 

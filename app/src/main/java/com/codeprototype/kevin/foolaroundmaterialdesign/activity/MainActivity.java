@@ -15,7 +15,10 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
+import com.codeprototype.kevin.foolaroundmaterialdesign.dbmodel.Token;
+import com.parse.LogInCallback;
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
 import com.parse.ParseUser;
 
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
@@ -31,8 +34,20 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
 
-        if (ParseUser.getCurrentUser() == null) {
+        Token token = Token.getToken();
+
+        if (ParseUser.getCurrentUser() == null && token == null) {
             navigateToLogin();
+        } else if (token != null) {
+            String sessionToken = Token.getToken().sessionToken;
+            ParseUser.becomeInBackground(sessionToken, new LogInCallback() {
+                @Override
+                public void done(ParseUser user, ParseException e) {
+                    if (e != null) {
+                        navigateToLogin();
+                    }
+                }
+            });
         }
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
