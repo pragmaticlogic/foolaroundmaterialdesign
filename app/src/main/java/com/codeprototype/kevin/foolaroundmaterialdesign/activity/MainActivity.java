@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 @Override
                 public void done(ParseUser user, ParseException e) {
                     if (e != null) {
-                        navigateToLogin();
+                        //TODO parse bug, navigateToLogin();
                     }
                 }
             });
