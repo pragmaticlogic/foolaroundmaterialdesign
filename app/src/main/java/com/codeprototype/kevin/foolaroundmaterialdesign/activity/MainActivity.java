@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.activeandroid.query.Delete;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
 import com.codeprototype.kevin.foolaroundmaterialdesign.dbmodel.Token;
 import com.parse.LogInCallback;
@@ -38,13 +39,13 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         if (ParseUser.getCurrentUser() == null && token == null) {
             navigateToLogin();
-        } else if (token != null) {
-            String sessionToken = Token.getToken().sessionToken;
+        } else if (ParseUser.getCurrentUser() == null && token != null) {
+            String sessionToken = token.sessionToken;
             ParseUser.becomeInBackground(sessionToken, new LogInCallback() {
                 @Override
                 public void done(ParseUser user, ParseException e) {
                     if (e != null) {
-                        //TODO parse bug, navigateToLogin();
+                        navigateToLogin();
                     }
                 }
             });
@@ -89,6 +90,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         else if (id == R.id.action_logout) {
             ParseUser.logOut();
+            Token token = Token.getToken();
+            new Delete().from(Token.class).where("SessionToken = ?", token.sessionToken).execute();
+            Token token2 = Token.getToken();
             navigateToLogin();
         }
 
