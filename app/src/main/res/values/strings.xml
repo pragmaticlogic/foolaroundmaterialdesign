@@ -40,4 +40,13 @@
     <string name="empty_messages_label">No new messages</string>
     <string name="title_activity_edit_friends">EditFriendsActivity</string>
     <string name="error_title">Error</string>
+    <string name="action_camera">Camera</string>
+    <string name="action_camera_choices">Select a camera choice</string>
+    <string name="choose_camera_choices">Choose</string>
+    <string-array name="camera_choices">
+        <item>Take Picture</item>
+        <item>Take Video</item>
+        <item>Choose Picture</item>
+        <item>Choose Video</item>
+    </string-array>
 </resources>

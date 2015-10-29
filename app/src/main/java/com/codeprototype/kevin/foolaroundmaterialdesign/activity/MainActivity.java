@@ -15,6 +15,7 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
 import com.codeprototype.kevin.foolaroundmaterialdesign.dbmodel.Token;
 import com.parse.LogInCallback;
@@ -86,6 +87,24 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         else if (id == R.id.action_search) {
             Toast.makeText(getApplicationContext(), "Search action is selected!", Toast.LENGTH_SHORT).show();
             return true;
+        }
+
+        else if (id == R.id.action_camera) {
+            new MaterialDialog.Builder(this)
+                    .title(R.string.action_camera_choices)
+                    .items(R.array.camera_choices)
+                    .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                        @Override
+                        public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                            /**
+                             * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
+                             * returning false here won't allow the newly selected radio button to actually be selected.
+                             **/
+                            return true;
+                        }
+                    })
+                    .positiveText(R.string.choose_camera_choices)
+                    .show();
         }
 
         else if (id == R.id.action_logout) {
