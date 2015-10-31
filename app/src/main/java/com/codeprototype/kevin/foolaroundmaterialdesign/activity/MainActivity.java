@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                         try {
                          inputStream.close();
                         } catch (Exception e) {
+                            //Intentionally left blank
                         }
                     }
 
@@ -133,6 +134,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 mediaScanIntent.setData(mMediaUri);
                 sendBroadcast(mediaScanIntent);
             }
+
+            Intent intent = new Intent(this, RecepientsActivity.class);
+            intent.setData(mMediaUri);
+            startActivity(intent);
+
         } else if (resultCode != RESULT_CANCELED) {
             Toast.makeText(this, "OError!!!!", Toast.LENGTH_LONG).show();
         } else if (resultCode == RESULT_CANCELED) {

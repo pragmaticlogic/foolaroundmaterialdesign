@@ -5,7 +5,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-feature android:name="android.hardware.camera2" android:required="true"></uses-feature>
+
+    <uses-feature
+        android:name="android.hardware.camera2"
+        android:required="true" />
 
     <application
         android:name=".FoolAroundApplication"
@@ -44,8 +47,22 @@
                 android:value="com.codeprototype.kevin.foolaroundmaterialdesign.activity.MainActivity" />
         </activity>
 
-        <meta-data android:name="AA_DB_NAME" android:value="Pickrand.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="5" />
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="Pickrand.db" />
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="5" />
+
+        <activity
+            android:name=".activity.RecepientsActivity"
+            android:label="@string/title_activity_recepients"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.codeprototype.kevin.foolaroundmaterialdesign.activity.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

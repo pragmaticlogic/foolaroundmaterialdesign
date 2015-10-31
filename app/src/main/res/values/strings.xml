@@ -49,4 +49,5 @@
         <item>Choose Picture</item>
         <item>Choose Video</item>
     </string-array>
+    <string name="title_activity_recepients">Choose Recepients</string>
 </resources>
