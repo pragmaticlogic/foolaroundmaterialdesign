@@ -1,5 +1,6 @@
 package com.codeprototype.kevin.foolaroundmaterialdesign.activity;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,22 +15,28 @@ import android.widget.ListView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.codeprototype.kevin.foolaroundmaterialdesign.ParseConstants;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
+import com.codeprototype.kevin.foolaroundmaterialdesign.helper.FileHelper;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RecepientsActivity extends AppCompatActivity {
 
-    public static final String TAG  = RecepientsActivity.class.getSimpleName();
-    protected List<ParseUser> mUsers;
+    public static final String TAG = RecepientsActivity.class.getSimpleName();
+    protected List<ParseUser> mFriends;
     protected ParseRelation<ParseUser> mFriendsRelation;
     protected ParseUser mCurrentUser;
+    protected Uri mMediaUri;
+    protected String mFileType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +49,29 @@ public class RecepientsActivity extends AppCompatActivity {
         final ListView listView = (ListView) findViewById(android.R.id.list);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
+        mMediaUri = getIntent().getData();
+        mFileType = getIntent().getExtras().getString(ParseConstants.KEY_FILE_TYPE);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                ArrayList<String> recipientIds = getRecipientIds();
+                if (recipientIds.size() <= 0) {
+                    Snackbar.make(view, "You must select at least one recipient to send the message", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    ParseObject message = createMessage(mCurrentUser.getObjectId(), mCurrentUser.getUsername(), recipientIds, mFileType);
+                    if (message == null) {
+                        Snackbar.make(view, "There was a problem with the file selected", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    } else {
+                        send(message);
+                        Snackbar.make(view, "Your message was sent successfully", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        finish();
+                    }
+                }
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -61,74 +85,29 @@ public class RecepientsActivity extends AppCompatActivity {
 
         setProgressBarIndeterminateVisibility(true);
 
-        mFriendsRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
+        ParseQuery<ParseUser> query = mFriendsRelation.getQuery();
+        query.orderByAscending("username");
+        query.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> friends, ParseException e) {
                 if (e == null) {
-                    String[] friendnames = new String[friends.size()];
+                    mFriends = friends;
+                    String[] friendNames = new String[friends.size()];
                     int i = 0;
                     for (ParseUser friend : friends) {
-                        friendnames[i] = friend.getUsername();
+                        friendNames[i] = friend.getUsername();
                         i++;
                     }
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                             RecepientsActivity.this,
-                            android.R.layout.simple_list_item_checked, friendnames);
+                            android.R.layout.simple_list_item_checked, friendNames);
                     ListView listView = (ListView) findViewById(android.R.id.list);
                     listView.setAdapter(adapter);
-
-                    /*
-                    for (int i = 0; i < mUsers.size(); i++) {
-                        ParseUser user = mUsers.get(i);
-                        for (ParseUser friend : friends) {
-                            if (user.getObjectId().equals(friend.getObjectId())) {
-                                listView.setItemChecked(i, true);
-                            }
-                        }
-                    }*/
                 } else {
                     Log.e(TAG, e.getMessage());
                 }
             }
         });
-
-        /*
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo("", mCurrentUser.getObjectId());
-        query.orderByAscending(ParseConstants.KEY_USERNAME);
-        query.setLimit(1000);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> users, ParseException e) {
-                setProgressBarIndeterminateVisibility(false);
-
-                if (e == null) {
-                    mUsers = users;
-                    String[] usernames = new String[mUsers.size()];
-                    int i = 0;
-                    for (ParseUser user : mUsers) {
-                        usernames[i] = user.getUsername();
-                        i++;
-                    }
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                            RecepientsActivity.this,
-                            android.R.layout.simple_list_item_checked, usernames);
-                    ListView listView = (ListView) findViewById(android.R.id.list);
-                    listView.setAdapter(adapter);
-
-                    addFriendCheckmarks();
-                } else {
-                    Log.e(TAG, e.getMessage());
-                    new MaterialDialog.Builder(RecepientsActivity.this)
-                            .title(R.string.error_title)
-                            .content(e.getMessage())
-                            .positiveText(android.R.string.ok)
-                            .negativeText(android.R.string.cancel)
-                            .show();
-                }
-            }
-        });
-        */
     }
 
 
@@ -139,8 +118,8 @@ public class RecepientsActivity extends AppCompatActivity {
                 if (e == null) {
                     ListView listView = (ListView) findViewById(android.R.id.list);
 
-                    for (int i = 0; i < mUsers.size(); i++) {
-                        ParseUser user = mUsers.get(i);
+                    for (int i = 0; i < mFriends.size(); i++) {
+                        ParseUser user = mFriends.get(i);
                         for (ParseUser friend : friends) {
                             if (user.getObjectId().equals(friend.getObjectId())) {
                                 listView.setItemChecked(i, true);
@@ -154,18 +133,52 @@ public class RecepientsActivity extends AppCompatActivity {
         });
     }
 
-    protected ParseObject createMessage() {
+    protected ParseObject createMessage(String senderId, String senderName,
+                                        ArrayList<String> recipientIds,
+                                        String fileType) {
         ParseObject message = new ParseObject(ParseConstants.CLASS_MESSAGES);
-        message.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
-        message.put(ParseConstants.KEY_SENDER_NAME, mCurrentUser.getUsername());
-        message.put(ParseConstants.KEY_RECIPIENTS_IDS, getRecipientIds());
+        message.put(ParseConstants.KEY_SENDER_ID, senderId);
+        message.put(ParseConstants.KEY_SENDER_NAME, senderName);
+        message.put(ParseConstants.KEY_RECIPIENTS_IDS, recipientIds);
+        message.put(ParseConstants.KEY_FILE_TYPE, fileType);
 
-        return message;
+        byte[] fileBytes = FileHelper.getByteArrayFromFile(this, mMediaUri);
+        if (fileBytes == null) {
+            return null;
+        } else {
+            if (mFileType.equals(ParseConstants.TYPE_IMAGE)) {
+                fileBytes = FileHelper.reduceImageForUpload(fileBytes);
+            }
+
+            String fileName = FileHelper.getFileName(this, mMediaUri, mFileType);
+            ParseFile file = new ParseFile(fileName, fileBytes);
+            message.put(ParseConstants.KEY_FILE, file);
+
+            return message;
+        }
     }
 
     protected ArrayList<String> getRecipientIds() {
         ArrayList<String> recipientIds = new ArrayList<String>();
-        //for (int i = 0; i < getListView())
+        ListView listView = (ListView) findViewById(android.R.id.list);
+        for (int i = 0; i < listView.getCount(); i++) {
+            if (listView.isItemChecked(i)) {
+                recipientIds.add(mFriends.get(i).getObjectId());
+            }
+        }
         return recipientIds;
+    }
+
+    protected void send(ParseObject message) {
+        message.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.i(TAG, e.getMessage());
+                } else { //success
+
+                }
+            }
+        });
     }
 }

@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.codeprototype.kevin.foolaroundmaterialdesign.ParseConstants;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
 import com.codeprototype.kevin.foolaroundmaterialdesign.dbmodel.Token;
 import com.parse.LogInCallback;
@@ -95,8 +96,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        String fileType;
+
         if (resultCode == RESULT_OK) {
             if (requestCode == PICK_PHOTO_REQUEST || requestCode == PICK_VIDEO_REQUEST) {
+                fileType = ParseConstants.TYPE_IMAGE;
                 if (data == null) {
                     Toast.makeText(this, "OError!!!!", Toast.LENGTH_LONG).show();
                 } else {
@@ -130,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                     }
                 }
             } else {
+                fileType = ParseConstants.TYPE_VIDEO;
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                 mediaScanIntent.setData(mMediaUri);
                 sendBroadcast(mediaScanIntent);
@@ -137,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
             Intent intent = new Intent(this, RecepientsActivity.class);
             intent.setData(mMediaUri);
+            intent.putExtra(ParseConstants.KEY_FILE_TYPE, fileType);
             startActivity(intent);
 
         } else if (resultCode != RESULT_CANCELED) {

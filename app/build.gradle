@@ -36,4 +36,5 @@ dependencies {
         transitive = true
     }
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
+    compile files('libs/commons-io-2.4.jar')
 }
