@@ -2,6 +2,7 @@ package com.codeprototype.kevin.foolaroundmaterialdesign.activity;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -67,9 +68,6 @@ public class RecepientsActivity extends AppCompatActivity {
                                 .setAction("Action", null).show();
                     } else {
                         send(message);
-                        Snackbar.make(view, "Your message was sent successfully", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                        finish();
                     }
                 }
             }
@@ -173,10 +171,16 @@ public class RecepientsActivity extends AppCompatActivity {
         message.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
+                final CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id
+                        .coordinatorLayout);
                 if (e != null) {
                     Log.i(TAG, e.getMessage());
+                    Snackbar.make(coordinatorLayout, "Error " + e.getMessage(), Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 } else { //success
-
+                    Snackbar.make(coordinatorLayout, "Your message was sent successfully", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    finish();
                 }
             }
         });
