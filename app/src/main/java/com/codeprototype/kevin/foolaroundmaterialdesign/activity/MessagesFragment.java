@@ -1,17 +1,16 @@
 package com.codeprototype.kevin.foolaroundmaterialdesign.activity;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.codeprototype.kevin.foolaroundmaterialdesign.ParseConstants;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
@@ -28,6 +27,7 @@ import java.util.List;
  */
 public class MessagesFragment extends Fragment {
     RecyclerView mRecyclerView;
+    ContentAdapter mAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,17 +43,46 @@ public class MessagesFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        ContentAdapter adapter = new ContentAdapter();
-        mRecyclerView.setAdapter(adapter);
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(ParseConstants.CLASS_MESSAGES);
+        query.whereEqualTo(ParseConstants.KEY_RECIPIENTS_IDS, ParseUser.getCurrentUser().getObjectId());
+        query.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> messages, ParseException e) {
+                //getActivity().setProgressBarIndeterminateVisibility(false);
+                if (e == null) {
+                    mAdapter.setDataSource(messages);
+                    mAdapter.notifyDataSetChanged();
+                } else {
+
+                }
+            }
+        });
+
+
+        mAdapter = new ContentAdapter(getActivity());
+        mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView thumbnail;
+        public TextView title;
+
+        /*
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.message_list, parent, false));
         }
+        */
+        public ViewHolder(View view) {
+            super(view);
+
+            this.thumbnail = (ImageView) view.findViewById(R.id.list_avatar);
+            this.title = (TextView) view.findViewById(R.id.list_title);
+        }
     }
+
     /**
      * Adapter to display recycler view.
      */
@@ -63,24 +92,52 @@ public class MessagesFragment extends Fragment {
         private Context mContext;
         protected List<ParseObject> mMessages;
 
-        public ContentAdapter() {
+        public ContentAdapter(Context context) {
+            mContext = context;
+        }
 
+        public void setDataSource(List<ParseObject> messages) {
+            mMessages = messages;
         }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
+            //\\return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            View v = inflater.inflate(R.layout.message_list, parent, false);
+
+            ViewHolder viewHolder = new ViewHolder(v);
+
+            return viewHolder;
         }
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            // no-op
+            ParseObject message = mMessages.get(position);
+            holder.title.setText(message.getString(ParseConstants.KEY_SENDER_NAME));
+
+            //Handle click event on both title and image click
+            holder.title.setOnClickListener(clickListener);
+            holder.thumbnail.setOnClickListener(clickListener);
         }
 
         @Override
         public int getItemCount() {
-            return LENGTH;
+            if (mMessages == null)
+                return 0;
+            else
+                return mMessages.size();
         }
+
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //ParseObject message = mMessages.get();
+                ImageView imageView = (ImageView) view.findViewById(R.id.list_avatar);
+                Intent intent = new Intent(mContext, ViewImageActivity.class);
+                mContext.startActivity(intent);
+            }
+        };
     }
     /*
     public MessagesFragment() {

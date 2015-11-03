@@ -50,4 +50,8 @@
         <item>Choose Video</item>
     </string-array>
     <string name="title_activity_recepients">Choose Recepients</string>
+    <string name="item_title">Placeholder title</string>
+    <string name="item_desc">Placeholder description.
+    </string>
+    <string name="title_activity_view_image">ViewImageActivity</string>
 </resources>
