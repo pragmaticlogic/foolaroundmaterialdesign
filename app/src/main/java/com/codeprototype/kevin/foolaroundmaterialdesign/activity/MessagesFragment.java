@@ -2,10 +2,12 @@ package com.codeprototype.kevin.foolaroundmaterialdesign.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import com.codeprototype.kevin.foolaroundmaterialdesign.ParseConstants;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -66,20 +69,43 @@ public class MessagesFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView thumbnail;
-        public TextView title;
+    public static class ViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener {
+        public ImageView mThumbnail;
+        public TextView mTitle;
+        public ParseObject mMessage;
+        private Context mContext;
 
         /*
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.message_list, parent, false));
         }
         */
-        public ViewHolder(View view) {
+        public ViewHolder(View view, Context context) {
             super(view);
 
-            this.thumbnail = (ImageView) view.findViewById(R.id.list_avatar);
-            this.title = (TextView) view.findViewById(R.id.list_title);
+            mThumbnail = (ImageView) view.findViewById(R.id.list_avatar);
+            mTitle = (TextView) view.findViewById(R.id.list_title);
+            mContext = context;
+
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v)
+        {
+
+            String messageType = mMessage.getString(ParseConstants.KEY_FILE_TYPE);
+            ParseFile file = mMessage.getParseFile(ParseConstants.KEY_FILE);
+            Uri fileUri = Uri.parse(file.getUrl());
+
+            if (messageType.equals(ParseConstants.TYPE_IMAGE)) {
+                Intent intent = new Intent(mContext, ViewImageActivity.class);
+                intent.setData(fileUri);
+                mContext.startActivity(intent);
+            } else {
+
+            }
         }
     }
 
@@ -106,7 +132,7 @@ public class MessagesFragment extends Fragment {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View v = inflater.inflate(R.layout.message_list, parent, false);
 
-            ViewHolder viewHolder = new ViewHolder(v);
+            ViewHolder viewHolder = new ViewHolder(v, mContext);
 
             return viewHolder;
         }
@@ -114,11 +140,12 @@ public class MessagesFragment extends Fragment {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             ParseObject message = mMessages.get(position);
-            holder.title.setText(message.getString(ParseConstants.KEY_SENDER_NAME));
+            holder.mTitle.setText(message.getString(ParseConstants.KEY_SENDER_NAME));
+            holder.mMessage = message;
 
             //Handle click event on both title and image click
-            holder.title.setOnClickListener(clickListener);
-            holder.thumbnail.setOnClickListener(clickListener);
+            //holder.title.setOnClickListener(clickListener);
+            //holder.thumbnail.setOnClickListener(clickListener);
         }
 
         @Override
@@ -129,15 +156,17 @@ public class MessagesFragment extends Fragment {
                 return mMessages.size();
         }
 
+        /*
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //ParseObject message = mMessages.get();
                 ImageView imageView = (ImageView) view.findViewById(R.id.list_avatar);
+                Log.d("MessageFragment", imageView.toString());
                 Intent intent = new Intent(mContext, ViewImageActivity.class);
                 mContext.startActivity(intent);
             }
-        };
+        };*/
     }
     /*
     public MessagesFragment() {

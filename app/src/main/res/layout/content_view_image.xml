@@ -10,4 +10,27 @@
     tools:showIn="@layout/activity_view_image"
     tools:context="com.codeprototype.kevin.foolaroundmaterialdesign.activity.ViewImageActivity">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="35dip"
+        android:layout_height="35dip"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:maxHeight="35dip"
+        android:minHeight="35dip"
+        android:minWidth="10dip"
+        android:maxWidth="10dip"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"/>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitCenter" />
 </RelativeLayout>
