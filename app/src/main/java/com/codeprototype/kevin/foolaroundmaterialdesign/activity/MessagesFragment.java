@@ -17,11 +17,13 @@ import android.widget.TextView;
 import com.codeprototype.kevin.foolaroundmaterialdesign.ParseConstants;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -52,7 +54,6 @@ public class MessagesFragment extends Fragment {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> messages, ParseException e) {
-                //getActivity().setProgressBarIndeterminateVisibility(false);
                 if (e == null) {
                     mAdapter.setDataSource(messages);
                     mAdapter.notifyDataSetChanged();
@@ -73,14 +74,9 @@ public class MessagesFragment extends Fragment {
             implements View.OnClickListener {
         public ImageView mThumbnail;
         public TextView mTitle;
-        public ParseObject mMessage;
+        private ParseObject mMessage;
         private Context mContext;
 
-        /*
-        public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.message_list, parent, false));
-        }
-        */
         public ViewHolder(View view, Context context) {
             super(view);
 
@@ -94,7 +90,6 @@ public class MessagesFragment extends Fragment {
         @Override
         public void onClick(View v)
         {
-
             String messageType = mMessage.getString(ParseConstants.KEY_FILE_TYPE);
             ParseFile file = mMessage.getParseFile(ParseConstants.KEY_FILE);
             Uri fileUri = Uri.parse(file.getUrl());
@@ -105,6 +100,17 @@ public class MessagesFragment extends Fragment {
                 mContext.startActivity(intent);
             } else {
 
+            }
+        }
+
+        public void setMessage(ParseObject message) {
+            mMessage = message;
+            String messageType = mMessage.getString(ParseConstants.KEY_FILE_TYPE);
+            ParseFile file = mMessage.getParseFile(ParseConstants.KEY_FILE);
+            Uri fileUri = Uri.parse(file.getUrl());
+
+            if (messageType.equals(ParseConstants.TYPE_IMAGE)) {
+                Picasso.with(mContext).load(fileUri).into(mThumbnail);
             }
         }
     }
@@ -128,7 +134,6 @@ public class MessagesFragment extends Fragment {
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            //\\return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View v = inflater.inflate(R.layout.message_list, parent, false);
 
@@ -141,11 +146,7 @@ public class MessagesFragment extends Fragment {
         public void onBindViewHolder(ViewHolder holder, int position) {
             ParseObject message = mMessages.get(position);
             holder.mTitle.setText(message.getString(ParseConstants.KEY_SENDER_NAME));
-            holder.mMessage = message;
-
-            //Handle click event on both title and image click
-            //holder.title.setOnClickListener(clickListener);
-            //holder.thumbnail.setOnClickListener(clickListener);
+            holder.setMessage(message);
         }
 
         @Override
@@ -155,85 +156,5 @@ public class MessagesFragment extends Fragment {
             else
                 return mMessages.size();
         }
-
-        /*
-        View.OnClickListener clickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //ParseObject message = mMessages.get();
-                ImageView imageView = (ImageView) view.findViewById(R.id.list_avatar);
-                Log.d("MessageFragment", imageView.toString());
-                Intent intent = new Intent(mContext, ViewImageActivity.class);
-                mContext.startActivity(intent);
-            }
-        };*/
     }
-    /*
-    public MessagesFragment() {
-
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        getActivity().setProgressBarIndeterminateVisibility(true);
-
-        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(ParseConstants.CLASS_MESSAGES);
-        query.whereEqualTo(ParseConstants.KEY_RECIPIENTS_IDS, ParseUser.getCurrentUser().getObjectId());
-        query.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> messages, ParseException e) {
-                getActivity().setProgressBarIndeterminateVisibility(false);
-                if (e == null) {
-                    ListView listView = getListView();
-                    mMessages = messages;
-
-                    String[] userNames = new String[messages.size()];
-                    int i = 0;
-                    for (ParseObject message : messages) {
-                        userNames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
-                        i++;
-                    }
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                            listView.getContext(),
-                            android.R.layout.simple_list_item_1,
-                            userNames
-                    );
-                    setListAdapter(arrayAdapter);
-
-                } else {
-
-                }
-            }
-        });
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_messages, container, false);
-
-
-        // Inflate the layout for this fragment
-        return rootView;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-    */
 }
