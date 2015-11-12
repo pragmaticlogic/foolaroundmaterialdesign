@@ -12,10 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.codeprototype.kevin.foolaroundmaterialdesign.ParseConstants;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
+import com.codeprototype.kevin.foolaroundmaterialdesign.view.RoundedTransformation;
 import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -23,6 +25,7 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -76,12 +79,16 @@ public class MessagesFragment extends Fragment {
         public TextView mTitle;
         private ParseObject mMessage;
         private Context mContext;
+        private ProgressBar mProgressBar = null;
 
         public ViewHolder(View view, Context context) {
             super(view);
 
-            mThumbnail = (ImageView) view.findViewById(R.id.list_avatar);
-            mTitle = (TextView) view.findViewById(R.id.list_title);
+            mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+            mProgressBar.setVisibility(View.VISIBLE);
+
+            mThumbnail = (ImageView) view.findViewById(R.id.imageThumbnail);
+            mTitle = (TextView) view.findViewById(R.id.imageTitle);
             mContext = context;
 
             view.setOnClickListener(this);
@@ -110,7 +117,37 @@ public class MessagesFragment extends Fragment {
             Uri fileUri = Uri.parse(file.getUrl());
 
             if (messageType.equals(ParseConstants.TYPE_IMAGE)) {
-                Picasso.with(mContext).load(fileUri).into(mThumbnail);
+                Picasso.with(mContext).load(fileUri)
+                        //22143157/android-picasso-placeholder-and-error-image-styling
+                        .transform(new RoundedTransformation(50, 4))
+                        .resizeDimen(R.dimen.avator_size, R.dimen.avator_size)
+                        .centerCrop()
+                        .into(mThumbnail,
+                                new ImageLoadedCallback(mProgressBar) {
+                                    @Override
+                                    public void onSuccess() {
+                                        if (mProgressBar != null) {
+                                            mProgressBar.setVisibility(View.GONE);
+                                        }
+                                    }
+                                });
+            }
+        }
+
+        private class ImageLoadedCallback implements Callback {
+            ProgressBar _progressBar;
+            public  ImageLoadedCallback(ProgressBar progressBar){
+                _progressBar = progressBar;
+            }
+
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError() {
+
             }
         }
     }
