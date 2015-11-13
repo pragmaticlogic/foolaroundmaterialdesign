@@ -2,6 +2,7 @@ package com.codeprototype.kevin.foolaroundmaterialdesign.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -106,7 +107,9 @@ public class MessagesFragment extends Fragment {
                 intent.setData(fileUri);
                 mContext.startActivity(intent);
             } else {
-
+                Intent intent = new Intent(Intent.ACTION_VIEW, fileUri);
+                intent.setDataAndType(fileUri, "video/*");
+                mContext.startActivity(intent);
             }
         }
 
@@ -131,6 +134,11 @@ public class MessagesFragment extends Fragment {
                                         }
                                     }
                                 });
+            } else {
+                mProgressBar.setVisibility(View.GONE);
+                int color = Color.parseColor("#3F51B5"); //The color u want
+                mThumbnail.setColorFilter(color);
+                mThumbnail.setImageResource(R.drawable.ic_videocam_black_36dp);
             }
         }
 
