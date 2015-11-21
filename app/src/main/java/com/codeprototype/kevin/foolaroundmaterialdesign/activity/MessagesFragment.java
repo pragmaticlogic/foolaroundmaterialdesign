@@ -66,11 +66,14 @@ public class MessagesFragment extends Fragment {
             }
         });
 
+        if (mRecyclerView.getAdapter() == null) {
+            mAdapter = new ContentAdapter(getActivity());
+            mRecyclerView.setAdapter(mAdapter);
+            mRecyclerView.setHasFixedSize(true);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        } else {
 
-        mAdapter = new ContentAdapter(getActivity());
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder
@@ -106,6 +109,16 @@ public class MessagesFragment extends Fragment {
                 intent.setData(fileUri);
                 mContext.startActivity(intent);
             } else {
+                Intent intent = new Intent(Intent.ACTION_VIEW, fileUri);
+                intent.setDataAndType(fileUri, "video/*");
+                mContext.startActivity(intent);
+            }
+
+            //delete
+            List<String> ids = mMessage.getList(ParseConstants.KEY_RECIPIENTS_IDS);
+            if (ids.size() == 1) {
+                mMessage.deleteInBackground();
+            } else {
 
             }
         }
@@ -131,6 +144,10 @@ public class MessagesFragment extends Fragment {
                                         }
                                     }
                                 });
+            } else if (messageType.equals(ParseConstants.TYPE_VIDEO)) {
+                mProgressBar.setVisibility(View.GONE);
+                Picasso.with(mContext).load(R.drawable.ic_photo_camera_white_36dp)
+                        .into(mThumbnail);
             }
         }
 

@@ -99,41 +99,58 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         String fileType;
 
         if (resultCode == RESULT_OK) {
-            if (requestCode == PICK_PHOTO_REQUEST || requestCode == PICK_VIDEO_REQUEST) {
+            if (requestCode == PICK_PHOTO_REQUEST) {
                 fileType = ParseConstants.TYPE_IMAGE;
+
                 if (data == null) {
                     Toast.makeText(this, "OError!!!!", Toast.LENGTH_LONG).show();
                 } else {
                     mMediaUri = data.getData();
                 }
 
-                if (requestCode == PICK_VIDEO_REQUEST) {
-                    int fileSize = 0;
-                    InputStream inputStream = null;
-                    try {
-                        inputStream = getContentResolver().openInputStream(mMediaUri);
-                        fileSize = inputStream.available();
-                    } catch (FileNotFoundException fnf) {
-                        Toast.makeText(this, "Error opening file", Toast.LENGTH_LONG).show();
-                        return;
-                    } catch (IOException ioe) {
-                        Toast.makeText(this, "Error opening file", Toast.LENGTH_LONG).show();
-                        return;
-                    } finally {
-                        try {
-                         inputStream.close();
-                        } catch (Exception e) {
-                            //Intentionally left blank
-                        }
-                    }
+            } else if (requestCode == PICK_VIDEO_REQUEST) {
+                fileType = ParseConstants.TYPE_VIDEO;
 
-                    if (fileSize >= FILE_SIZE_LIMIT) {
-                        Toast.makeText(MainActivity.this, "The selected video must be less than 10MB",
-                                Toast.LENGTH_LONG).show();
-                        return;
+                if (data == null) {
+                    Toast.makeText(this, "OError!!!!", Toast.LENGTH_LONG).show();
+                } else {
+                    mMediaUri = data.getData();
+                }
+
+                int fileSize = 0;
+                InputStream inputStream = null;
+                try {
+                    inputStream = getContentResolver().openInputStream(mMediaUri);
+                    fileSize = inputStream.available();
+                } catch (FileNotFoundException fnf) {
+                    Toast.makeText(this, "Error opening file", Toast.LENGTH_LONG).show();
+                    return;
+                } catch (IOException ioe) {
+                    Toast.makeText(this, "Error opening file", Toast.LENGTH_LONG).show();
+                    return;
+                } finally {
+                    try {
+                        inputStream.close();
+                    } catch (Exception e) {
+                        //Intentionally left blank
                     }
                 }
-            } else {
+
+                if (fileSize >= FILE_SIZE_LIMIT) {
+                    Toast.makeText(MainActivity.this, "The selected video must be less than 10MB",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+            } else if (requestCode == TAKE_PHOTO_REQUEST) {
+                fileType = ParseConstants.TYPE_IMAGE;
+
+                fileType = ParseConstants.TYPE_VIDEO;
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                mediaScanIntent.setData(mMediaUri);
+                sendBroadcast(mediaScanIntent);
+            } else { //TAKE_VIDEO_REQUEST
+                fileType = ParseConstants.TYPE_VIDEO;
                 fileType = ParseConstants.TYPE_VIDEO;
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                 mediaScanIntent.setData(mMediaUri);
