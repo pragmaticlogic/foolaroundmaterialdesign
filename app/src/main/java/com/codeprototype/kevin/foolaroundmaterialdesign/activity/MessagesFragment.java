@@ -28,6 +28,7 @@ import com.parse.ParseUser;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -119,7 +120,11 @@ public class MessagesFragment extends Fragment {
             if (ids.size() == 1) {
                 mMessage.deleteInBackground();
             } else {
-
+                ids.remove(ParseUser.getCurrentUser().getObjectId());
+                ArrayList<String> idsToRemove = new ArrayList<String>();
+                idsToRemove.add(ParseUser.getCurrentUser().getObjectId());
+                mMessage.removeAll(ParseConstants.KEY_RECIPIENTS_IDS, idsToRemove);
+                mMessage.saveInBackground();
             }
         }
 
