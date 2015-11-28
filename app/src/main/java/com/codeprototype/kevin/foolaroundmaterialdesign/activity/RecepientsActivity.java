@@ -17,6 +17,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.codeprototype.kevin.foolaroundmaterialdesign.ParseConstants;
 import com.codeprototype.kevin.foolaroundmaterialdesign.R;
 import com.codeprototype.kevin.foolaroundmaterialdesign.helper.FileHelper;
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -57,22 +58,35 @@ public class RecepientsActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                CircularProgressView progressView = (CircularProgressView) findViewById(R.id.progress_view);
+                progressView.startAnimation();
+
                 ArrayList<String> recipientIds = getRecipientIds();
                 if (recipientIds.size() <= 0) {
                     Snackbar.make(view, "You must select at least one recipient to send the message", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
-                    ParseObject message = createMessage(mCurrentUser.getObjectId(), mCurrentUser.getUsername(), recipientIds, mFileType);
-                    if (message == null) {
-                        Snackbar.make(view, "There was a problem with the file selected", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    } else {
-                        send(message);
-                    }
+                    createAndSendMessage(view, recipientIds);
                 }
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    protected void createAndSendMessage(final View view, final ArrayList<String> recipientIds) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                ParseObject message = createMessage(mCurrentUser.getObjectId(), mCurrentUser.getUsername(), recipientIds, mFileType);
+                if (message == null) {
+                    Snackbar.make(view, "There was a problem with the file selected", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    send(message);
+                }
+            }
+        };
+        new Thread(runnable).start();
     }
 
     protected void onResume() {

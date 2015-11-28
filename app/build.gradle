@@ -40,4 +40,5 @@ dependencies {
     compile 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
     compile files('libs/commons-io-2.4.jar')
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.github.rahatarmanahmed:circularprogressview:2.4.0'
 }

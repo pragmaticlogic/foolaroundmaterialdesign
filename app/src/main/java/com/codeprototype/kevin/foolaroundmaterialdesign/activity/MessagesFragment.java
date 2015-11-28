@@ -150,10 +150,6 @@ public class MessagesFragment extends Fragment {
                                         }
                                     }
                                 });
-            } else if (messageType.equals(ParseConstants.TYPE_VIDEO)) {
-                mProgressBar.setVisibility(View.GONE);
-                Picasso.with(mContext).load(R.drawable.ic_photo_camera_white_36dp)
-                        .into(mThumbnail);
             } else {
                 mProgressBar.setVisibility(View.GONE);
                 int color = Color.parseColor("#3F51B5"); //The color u want
